@@ -1,6 +1,6 @@
 # Agently-Talk-to-Control（Agently自然语言→控制）
 
-**[English](./README.md) | [中文](./README_CN.md)**
+**[English](./README.md) | 中文**
 
 ## 简介
 
@@ -20,3 +20,5 @@ Agently-Talk-to-Control是一个基于[Agently AI 应用开发框架](https://gi
 - 步骤 4：在浏览器中打开 Gradio UI 页面：默认地址为`http://127.0.0.1:7860/`
 
 ## 运行效果图
+
+<img width="480" alt="talk-to-control" src="https://github.com/user-attachments/assets/f6a09285-0620-4918-a577-d628c0bf4102" />
