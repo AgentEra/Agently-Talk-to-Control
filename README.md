@@ -26,3 +26,5 @@ This project presents how to create a complex agentic workflow to **analyse user
 - Step 4. Open Gradio UI page in your explorer: `http://127.0.0.1:7860/` by default
 
 ## Screenshot of Run Result
+
+<img width="480" alt="talk-to-control" src="https://github.com/user-attachments/assets/f6a09285-0620-4918-a577-d628c0bf4102" />
