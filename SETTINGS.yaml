@@ -1,0 +1,58 @@
+# Debug Settings
+DEBUG: false
+# Model Settings
+MODEL_CLIENT: "OAIClient"
+#MODEL_URL: "<Your-Base-URL>"
+MODEL_AUTH:
+  api_key: "<Your-API-Key>"
+MODEL_OPTIONS:
+  model: "gpt-4"
+# Proxy Settings
+#PROXY: "http://127.0.0.1:7890"
+# Initial Status
+INITIAL_STATUS:
+  camera_status:
+    camera_1:
+      power: 1
+      zoom_factor: 1.0
+    camera_2:
+      power: 0
+      zoom_factor: 1.0
+# Controllers
+CONTROLLERS:
+  turn_on_camera:
+    desc: "turn on the camera"
+    args:
+      camera_name:
+        $type: "'camera_1' | 'camera_2'"
+        $desc: "[Required]"
+    func: "turn_on_camera"
+    get: 
+      - "camera_status"
+    set: 
+      "camera_status.<$camera_name>.power": "<$power>"
+  turn_off_camera:
+    desc: "turn off the camera"
+    args:
+      camera_name:
+        $type: "'camera_1' | 'camera_2'"
+        $desc: "[Required]"
+    func: "turn_off_camera"
+    get: 
+      - "camera_status"
+    set: 
+      "camera_status.<$camera_name>.power": "<$power>"
+  zoom:
+    desc: "change zoom factor"
+    args:
+      target_camera:
+        $type: "'camera_1' | 'camera_2'"
+        $desc: "[Required]"
+      target_zoom_factor:
+        $type: "float"
+        $desc: "[Optional] Reset current zoom factor of the camera to target zoom factor."
+    func: "zoom_camera"
+    get: 
+      - "camera_status"
+    set: 
+      "camera_status.<$camera_name>.zoom_factor": "<$zoom_factor>"
