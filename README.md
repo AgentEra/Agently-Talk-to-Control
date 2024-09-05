@@ -99,7 +99,7 @@ Of course, as a showcase project, developers can extend more controllers and com
 
 OK, now 2 light components have been added to component pool. Let's try to talk to control them.
 
-
+<img width="480" alt="extend-controllers" src="https://github.com/user-attachments/assets/45c0532d-edea-4ec1-9bad-6028c77f8d48">
 
 Everything seems to be great! Enjoy it!
 
