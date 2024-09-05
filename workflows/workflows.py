@@ -48,8 +48,9 @@ def make_op_plan(inputs, storage):
                     "else output [].\n" +
                     "IF MULTIPLE DEVICE COMPONENTS NEED TO BE OPERATED THROUGH INSTRUCTIONS, " +
                     "EACH ACTION INSTRUCTION CAN ONLY SPECIFY ONE COMPONENT\n" +
-                    "For example: when user said 'all cameras' you should separate cameras into camera 1, camera 2, etc.",
-                    "YOU CAN USE OPERATIONS FROM {info.operation_dict} ONLY!!!"
+                    "For example: when user said 'all cameras' you should separate cameras into camera 1, camera 2, etc.\n" +
+                    "YOU CAN USE OPERATIONS FROM {info.operation_dict} ONLY!!!\n" +
+                    "ONE {action_plan} CAN ONLY POINT TO ONE OPERATION IN {info.operation_dict} ONLY!!!"
                 ),
                 "can_not_do": ("str", "if you can not accomplish {input}, explain why, else output ''.")
             })
@@ -97,7 +98,6 @@ def generate_calling_info(inputs, storage):
             .info(inputs["default"])
             .instruct([
                 "generate operation calling parameter values to achieve {input} purpose.",
-                "output language: Chinese",
             ])
             .output({
                 "can_do": ("bool", "judge if operation can be done according {info}"),
@@ -139,12 +139,14 @@ def return_value(inputs, storage):
     skip = workflow.public_storage.get("skip")
     explanation = workflow.public_storage.get("explanation")
     suggestion_order = workflow.public_storage.get("suggestion_order")
+    if skip:
+        if explanation:
+            app.emit_delta("[Can Not Apply]: " + explanation + "\n\n")
+        if suggestion_order:
+            app.emit_delta("[Suggestion]: " + suggestion_order + "\n\n")
     workflow.public_storage.set("explanation", None)
     workflow.public_storage.set("suggestion_order", None)
     workflow.public_storage.set("skip", False)
-    if skip:
-        app.emit_delta("[Can Not Apply]: " + explanation + "\n\n")
-        app.emit_delta("[Suggestion]: " + suggestion_order + "\n\n")
     return
 
 def print_result(inputs, storage):
