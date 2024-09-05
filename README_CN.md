@@ -89,9 +89,9 @@ Agently-Talk-to-Control是一个基于[Agently AI 应用开发框架](https://gi
                 $desc: "[Required] Range: 0(darkest)-100(brightest)"
     ```
 
-通过上面散步，我们就成功向设备池中添加了2个灯的状态及控制方法。现在，我们就试试通过Gradio界面来进行自然语言控制吧！
+通过上面三步，我们就成功向设备池中添加了2个灯的状态及控制方法。现在，我们就试试通过Gradio界面来进行自然语言控制吧！
 
-
+<img width="480" alt="extend-controllers" src="https://github.com/user-attachments/assets/45c0532d-edea-4ec1-9bad-6028c77f8d48">
 
 不错不错，看起来很棒，能够很好地拆解规划复杂的指令。
 
