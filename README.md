@@ -15,6 +15,13 @@ This project presents how to create a complex agentic workflow to **analyse user
 
 - **reject user's request with explanation or even suggestion**
 
+The applicable scenarios for this project include:
+
+- Acting as an input understanding module for smart home systems, interpreting and processing complex user input expressions to execute commands.
+- Acting as an auxiliary understanding module after speech-to-text conversion for devices used in manufacturing, monitoring, medical assistance, etc., aiding operators in providing auxiliary control during operations.
+- Acting as an input understanding and action planning module in enterprise office settings or other environments with numerous standardized action request interfaces, helping to comprehend and plan complex user input expressions and extract standardized information for requests.
+- ...
+
 ## How to Use
 
 - Step 1. Clone this repo: `git clone git@github.com:AgentEra/Agently-Talk-to-Control.git`
