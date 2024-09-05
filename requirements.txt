@@ -1,2 +1,2 @@
-Agently>=3.4.4.6
+Agently>=3.4.4.7
 gradio==4.39.0
