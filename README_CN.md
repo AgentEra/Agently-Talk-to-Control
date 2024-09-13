@@ -72,11 +72,11 @@ Agently-Talk-to-Control是一个基于[Agently AI 应用开发框架](https://gi
             desc: "turn on or off a target light"
             args:
                 light_name:
-                $type: "'light_a', 'light_b'"
-                $desc: "[Required]"
+                    $type: "'light_a', 'light_b'"
+                    $desc: "[Required]"
                 target_power:
-                $type: "int"
-                $desc: "[Required]0 - Off, 1 - On"
+                    $type: "int"
+                    $desc: "[Required]0 - Off, 1 - On"
             func: "control_light_power"
             # 将在生成控制函数调用参数值前，从环境中取出指定字段的值作为补充信息
             get:
@@ -89,11 +89,11 @@ Agently-Talk-to-Control是一个基于[Agently AI 应用开发框架](https://gi
             desc: "adjust a target light's brightness"
             args:
                 light_name:
-                $type: "'light_a', 'light_b'"
-                $desc: "[Required]"
+                    $type: "'light_a', 'light_b'"
+                    $desc: "[Required]"
                 brightness:
-                $type: "int"
-                $desc: "[Required] Range: 0(darkest)-100(brightest)"
+                    $type: "int"
+                    $desc: "[Required] Range: 0(darkest)-100(brightest)"
     ```
 
 通过上面三步，我们就成功向设备池中添加了2个灯的状态及控制方法。现在，我们就试试通过Gradio界面来进行自然语言控制吧！
