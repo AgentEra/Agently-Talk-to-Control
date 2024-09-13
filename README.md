@@ -80,11 +80,11 @@ Of course, as a showcase project, developers can extend more controllers and com
             desc: "turn on or off a target light"
             args:
                 light_name:
-                $type: "'light_a', 'light_b'"
-                $desc: "[Required]"
+                    $type: "'light_a', 'light_b'"
+                    $desc: "[Required]"
                 target_power:
-                $type: "int"
-                $desc: "[Required]0 - Off, 1 - On"
+                    $type: "int"
+                    $desc: "[Required]0 - Off, 1 - On"
             func: "control_light_power"
             # Will get environment information from target key before calling operation
             get:
@@ -97,11 +97,11 @@ Of course, as a showcase project, developers can extend more controllers and com
             desc: "adjust a target light's brightness"
             args:
                 light_name:
-                $type: "'light_a', 'light_b'"
-                $desc: "[Required]"
+                    $type: "'light_a', 'light_b'"
+                    $desc: "[Required]"
                 brightness:
-                $type: "int"
-                $desc: "[Required] Range: 0(darkest)-100(brightest)"
+                    $type: "int"
+                    $desc: "[Required] Range: 0(darkest)-100(brightest)"
     ```
 
 OK, now 2 light components have been added to component pool. Let's try to talk to control them.
