@@ -17,6 +17,6 @@ def create_controller_info(controller_info_settings: dict):
     for controller_name in controller_info_dict.keys():
         controller_info_desc_dict.update({ controller_name: {
             "desc": controller_info_dict[controller_name]["desc"],
-            "args": list(controller_info_dict[controller_name].keys())
+            "args": list(controller_info_dict[controller_name]["args"].keys())
     } })
     return controller_info_dict, controller_info_desc_dict
