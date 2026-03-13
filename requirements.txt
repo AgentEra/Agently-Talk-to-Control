@@ -1,2 +1,4 @@
-Agently>=3.3.4.7
-gradio==4.39.0
+Agently>=4.0.8,<5
+gradio>=4.39,<7
+PyYAML>=6.0
+python-dotenv>=1.0

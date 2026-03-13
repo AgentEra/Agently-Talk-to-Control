@@ -4,116 +4,187 @@
 
 ## 简介
 
-Agently-Talk-to-Control是一个基于[Agently AI 应用开发框架](https://github.com/Maplemx/Agently)开发的开源自然语言转控制操作的Agentic工作流展示项目。
+**Agently-Talk-to-Control** 是一个基于 [Agently AI 应用开发框架](https://github.com/Maplemx/Agently) 构建的开源“自然语言到控制操作”工作流示例项目。
 
-该项目展示了如何使用Agently AI 应用开发框架提供的各项能力创建一个复杂的Agentic工作流来**分析用户通过自然语言表达的需求**并决定是应该：
+它展示了如何把用户的一段自然语言请求，转成下面三类结果之一：
 
-- **直接基于当前环境信息回答用户的问题**或
-- **制定并执行包含一个或多个操作步骤的计划**或
-- **拒绝用户的要求，并给出解释，甚至是修正的建议**
+- **直接基于当前环境状态回答**
+- **拆解并执行一个或多个控制动作**
+- **拒绝请求，并给出解释或建议**
 
-该项目的适用场景包括：
+适用场景包括：
 
-- 作为智能家居的输入理解模块，理解和处理用户的复杂输入表达并完成指令执行
-- 作为制造、监视、医疗辅助等设备的语音转文字后的辅助理解模块，帮助操作者在作业过程中对设备进行辅助控制
-- 作为输入理解和行动规划模块，在企业办公等具有较多规范行动请求接口的场景中，帮助理解和规划用户的复杂输入表达并抽取标准信息进行请求
-- ……
+- 智能家居的自然语言输入理解
+- 制造、监控、医疗辅助等设备在语音转文字后的控制理解
+- 企业内部拥有大量标准控制接口，但仍需要自然语言规划与执行的场景
+
+## 它能做什么
+
+在默认配置下，项目维护一个包含两个摄像头的设备池，并能够：
+
+- 从自由表达的聊天输入中理解控制意图
+- 先读取当前设备状态，再决定回复、规划还是拒绝
+- 将复杂请求拆成有顺序的控制动作
+- 调用控制器函数，并把执行结果写回共享状态
+- 在聊天界面里展示规划与执行过程
 
 ## 使用方法
 
-- 步骤 1：克隆此仓库：`git clone git@github.com:AgentEra/Agently-Talk-to-Control.git`
-- 步骤 2：编辑`SETTINGS.yaml`，填写你的模型API KEY或切换到其他模型 [查看Agently框架支持的模型](https://github.com/AgentEra/Agently-Daily-News-Collector/blob/main/SETTINGS.yaml)
-- 步骤 3：运行 Python 脚本：`python app.py` 如果您没有安装Python，可以[从Python官方网站安装](https://www.python.org/)
-- 步骤 4：在浏览器中打开 Gradio UI 页面：默认地址为`http://127.0.0.1:7860/`
+1. 克隆仓库：
 
-## 使用默认配置的运行效果图
+```bash
+git clone git@github.com:AgentEra/Agently-Talk-to-Control.git
+cd Agently-Talk-to-Control
+```
 
-下图为仅使用默认配置（设备池中只包括两个摄像头）的情况下，运行的效果：
+2. 安装依赖：
+
+```bash
+pip install -r requirements.txt
+```
+
+3. 配置 `SETTINGS.yaml`。
+
+推荐使用 Agently v4 风格的模型配置：
+
+```yaml
+AGENT_SETTINGS:
+  provider: "OpenAICompatible"
+  options:
+    base_url: ${ENV.DEEPSEEK_BASE_URL}
+    model: ${ENV.DEEPSEEK_DEFAULT_MODEL}
+    auth:
+      api_key: ${ENV.DEEPSEEK_API_KEY}
+```
+
+4. 启动应用：
+
+```bash
+python app.py
+```
+
+5. 打开终端中显示的本地 Gradio 页面。默认地址是 `http://127.0.0.1:7860/`。
+
+## 环境变量配置
+
+`SETTINGS.yaml` 支持 `${ENV.VAR_NAME}` 语法。
+
+- `UI` 这类项目自身配置由本项目解析
+- `AGENT_SETTINGS` 这类 Agently 配置会原样透传给 Agently 的 `auto_load_env` 能力处理
+
+示例：
+
+```yaml
+AGENT_SETTINGS:
+  provider: "OpenAICompatible"
+  options:
+    base_url: ${ENV.DEEPSEEK_BASE_URL}
+    model: ${ENV.DEEPSEEK_DEFAULT_MODEL}
+    auth:
+      api_key: ${ENV.DEEPSEEK_API_KEY}
+
+UI:
+  server_port: ${ENV.APP_PORT}
+```
+
+## 运行效果图
+
+下图展示的是默认双摄像头配置下的运行效果。
 
 <img width="480" alt="talk-to-control" src="https://github.com/user-attachments/assets/f6a09285-0620-4918-a577-d628c0bf4102" />
 
-## 扩展更多的控制能力
+## 扩展更多控制能力
 
-当然了，本项目支持开发者通过简单的操作扩展解决方案的控制能力：
+你可以通过三步扩展新的设备与控制器。
 
-- 步骤 1. 如果想要扩展新的设备，将设备的初始状态添加到 `SETTINGS.yaml`
+1. 在 `SETTINGS.yaml` 中增加设备初始状态。
 
-    我们以向设备池中添加两个灯为例：
+示例：增加两个灯
 
-    ```yaml
-    INITIAL_STATUS:
-        light_status:
-            light_a:
-                power: 1
-                brightness: 50
-            light_b:
-                power: 0
-                brightness: 50
-    ```
+```yaml
+INITIAL_STATUS:
+  light_status:
+    light_a:
+      power: 1
+      brightness: 50
+    light_b:
+      power: 0
+      brightness: 50
+```
 
-- 步骤 2. 将控制方法函数添加到`controllers/controllers.py`
+2. 在 `controllers/controllers.py` 中增加控制函数。
 
-    ```python
-    def control_light_power(light_name, target_power):
-        power_status = ("Off", "On")
-        print(f"⚙️ [Turn On/Off Light]: { light_name } -> Power:{ power_status[target_power] }")
-        return { "light_name": light_name, "power": target_power }
+```python
+def control_light_power(light_name, target_power):
+    power_status = ("Off", "On")
+    print(f"⚙️ [Turn On/Off Light]: {light_name} -> Power:{power_status[target_power]}")
+    return {"light_name": light_name, "power": target_power}
 
-    def control_light_brightness(light_name, brightness):
-        print(f"⚙️ [Adjust Light Brightness]: { light_name } -> Brightness:{ brightness }")
-        return { "light_name": light_name, "brightness": brightness }
-    ```
 
-- 步骤 3. 根据步骤1中的设备状态设置和步骤2中的控制方法函数定义，将控制器设置添加到`SETTINGS.yaml`
+def control_light_brightness(light_name, brightness):
+    print(f"⚙️ [Adjust Light Brightness]: {light_name} -> Brightness:{brightness}")
+    return {"light_name": light_name, "brightness": brightness}
+```
 
-    ```yaml
-    CONTROLLERS:
-        control_light_power:
-            desc: "turn on or off a target light"
-            args:
-                light_name:
-                    $type: "'light_a', 'light_b'"
-                    $desc: "[Required]"
-                target_power:
-                    $type: "int"
-                    $desc: "[Required]0 - Off, 1 - On"
-            func: "control_light_power"
-            # 将在生成控制函数调用参数值前，从环境中取出指定字段的值作为补充信息
-            get:
-                - "light_status"
-            # 将在控制函数调用结束后，更新环境信息
-            # 占位符<$variable_name>将被控制函数的返回结果字典里的对应字段值替代
-            set:
-                "light_status.<$light_name>.power": "<$power>"
-        control_light_brightness:
-            desc: "adjust a target light's brightness"
-            args:
-                light_name:
-                    $type: "'light_a', 'light_b'"
-                    $desc: "[Required]"
-                brightness:
-                    $type: "int"
-                    $desc: "[Required] Range: 0(darkest)-100(brightest)"
-    ```
+3. 在 `SETTINGS.yaml` 中注册控制器。
 
-通过上面三步，我们就成功向设备池中添加了2个灯的状态及控制方法。现在，我们就试试通过Gradio界面来进行自然语言控制吧！
+```yaml
+CONTROLLERS:
+  control_light_power:
+    desc: "turn on or off a target light"
+    args:
+      light_name:
+        $type: "'light_a' | 'light_b'"
+        $desc: "[Required]"
+      target_power:
+        $type: "int"
+        $desc: "[Required] 0 - Off, 1 - On"
+    func: "control_light_power"
+    get:
+      - "light_status"
+    set:
+      "light_status.<$light_name>.power": "<$power>"
 
-<img width="480" alt="extend-controllers" src="https://github.com/user-attachments/assets/45c0532d-edea-4ec1-9bad-6028c77f8d48">
+  control_light_brightness:
+    desc: "adjust a target light's brightness"
+    args:
+      light_name:
+        $type: "'light_a' | 'light_b'"
+        $desc: "[Required]"
+      brightness:
+        $type: "int"
+        $desc: "[Required] Range: 0-100"
+```
 
-不错不错，看起来很棒，能够很好地拆解规划复杂的指令。
+## 当前 v4 版本说明
 
-## 主要依赖说明
+当前根目录是 **Agently v4** 版本，实现基于：
 
-- **Agently AI应用开发框架**：https://github.com/Maplemx/Agently | https://pypi.org/project/Agently/ | http://Agently.cn
+- **TriggerFlow** 编排
+- **Gradio** 聊天界面
+- Agently v4 风格模型配置，同时兼容旧版 `MODEL_*` 字段
 
-- **Gradio**: https://github.com/gradio-app/gradio | https://gradio.app/
+原 Agently v3 版本已经归档到 [`/v3`](./v3)。
 
----
+## 当前版本优化点
 
-如果您喜欢这个项目，请为本项目以及[Agently框架主仓库](https://github.com/Maplemx/Agently)点亮⭐️。
+相对于之前的根目录实现，当前版本补充了这些优化：
 
-> 💬 加入Agently AI应用开发框架开发者讨论微信群:
->
->  [点击此处申请](https://doc.weixin.qq.com/forms/AIoA8gcHAFMAScAhgZQABIlW6tV3l7QQf)或扫描下方二维码申请
->
-> <img width="120" alt="image" src="https://github.com/Maplemx/Agently/assets/4413155/7f4bc9bf-a125-4a1e-a0a4-0170b718c1a6">
+- **更细粒度的聊天流式输出**，不再只做粗粒度整块刷新
+- **首轮规划直接生成 action args**，很多请求不再需要为每个动作额外再发一次模型请求
+- **独立动作并行执行**，例如不同设备资源上的操作可以并发完成
+- **支持 `${ENV.VAR}` 配置读取**，方便接入本地或上游环境变量
+
+## 项目结构
+
+- `app.py`：Gradio 入口
+- `workflows/talk_to_control.py`：TriggerFlow 主编排逻辑
+- `controllers/`：控制器注册与设备动作
+- `utils/`：配置加载与聊天历史辅助
+- `tests/`：流程与配置测试
+- `v3/`：归档的 Agently v3 版本
+
+## 主要依赖
+
+- **Agently AI 应用开发框架**：https://github.com/Maplemx/Agently | https://pypi.org/project/Agently/ | https://agently.tech
+- **Gradio**：https://github.com/gradio-app/gradio | https://gradio.app/

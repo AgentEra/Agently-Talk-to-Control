@@ -1,19 +1,15 @@
+# Debug Settings
 DEBUG: false
-
-AGENT_SETTINGS:
-  provider: "OpenAICompatible"
-  options:
-    base_url: ${ENV.DEEPSEEK_BASE_URL}
-    model: ${ENV.DEEPSEEK_DEFAULT_MODEL}
-    auth:
-      api_key: ${ENV.DEEPSEEK_API_KEY}
-    request_options:
-      temperature: 0
-
-UI:
-  server_name: "0.0.0.0"
-  server_port: 7860
-
+# Model Settings
+MODEL_CLIENT: "OAIClient"
+#MODEL_URL: "<Your-Base-URL>"
+MODEL_AUTH:
+  api_key: "<Your-API-Key>"
+MODEL_OPTIONS:
+  model: "gpt-4"
+# Proxy Settings
+#PROXY: "http://127.0.0.1:7890"
+# Initial Status
 INITIAL_STATUS:
   camera_status:
     camera_1:
@@ -22,7 +18,7 @@ INITIAL_STATUS:
     camera_2:
       power: 0
       zoom_factor: 1.0
-
+# Controllers
 CONTROLLERS:
   turn_on_camera:
     desc: "turn on the camera"
@@ -31,9 +27,9 @@ CONTROLLERS:
         $type: "'camera_1' | 'camera_2'"
         $desc: "[Required]"
     func: "turn_on_camera"
-    get:
+    get: 
       - "camera_status"
-    set:
+    set: 
       "camera_status.<$camera_name>.power": "<$power>"
   turn_off_camera:
     desc: "turn off the camera"
@@ -42,9 +38,9 @@ CONTROLLERS:
         $type: "'camera_1' | 'camera_2'"
         $desc: "[Required]"
     func: "turn_off_camera"
-    get:
+    get: 
       - "camera_status"
-    set:
+    set: 
       "camera_status.<$camera_name>.power": "<$power>"
   zoom:
     desc: "change zoom factor"
@@ -56,7 +52,7 @@ CONTROLLERS:
         $type: "float"
         $desc: "[Optional] Reset current zoom factor of the camera to target zoom factor."
     func: "zoom_camera"
-    get:
+    get: 
       - "camera_status"
-    set:
+    set: 
       "camera_status.<$camera_name>.zoom_factor": "<$zoom_factor>"

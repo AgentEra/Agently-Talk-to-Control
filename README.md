@@ -4,124 +4,186 @@
 
 ## Introduction
 
-**Agently-Talk-to-Control** is an open-source chat text to control actions agentic workflow showcase project powered by [Agently AI application development framework](https://github.com/Maplemx/Agently).
+**Agently-Talk-to-Control** is an open-source natural-language-to-control workflow demo built with the [Agently AI application framework](https://github.com/Maplemx/Agently).
 
-This project presents how to create a complex agentic workflow to **analyse user requirement in natural language** and decide to:
+The project shows how to turn a user request in natural language into one of three outcomes:
 
-- **directly answer user's question with current environment information** or
+- **reply directly** from current environment state
+- **plan and execute one or multiple control actions**
+- **reject the request** with explanation and suggestion
 
+Typical scenarios include:
 
-- **make and execute an operation plan with one or many operation actions** or
+- smart home input understanding
+- device control after speech-to-text in manufacturing, monitoring, or medical assistance
+- enterprise environments with many standardized control APIs that still need natural-language understanding
 
-- **reject user's request with explanation or even suggestion**
+## What It Can Do
 
-The applicable scenarios for this project include:
+With the default settings, the project manages a small device pool with two cameras and can:
 
-- Acting as an input understanding module for smart home systems, interpreting and processing complex user input expressions to execute commands.
-- Acting as an auxiliary understanding module after speech-to-text conversion for devices used in manufacturing, monitoring, medical assistance, etc., aiding operators in providing auxiliary control during operations.
-- Acting as an input understanding and action planning module in enterprise office settings or other environments with numerous standardized action request interfaces, helping to comprehend and plan complex user input expressions and extract standardized information for requests.
-- ...
+- understand user intent from free-form chat
+- inspect current device status before deciding what to do
+- split a complex request into ordered control actions
+- execute controller functions and write the result back into shared status
+- show intermediate planning and execution output in the chat UI
 
 ## How to Use
 
-- Step 1. Clone this repo: `git clone git@github.com:AgentEra/Agently-Talk-to-Control.git`
+1. Clone this repo:
 
-- Step 2. Edit `SETTINGS.yaml` to fill in your model's API Key or change to other model [[View Agently Supported Models]](https://agently.tech/guides/model_settings/index.html)
+```bash
+git clone git@github.com:AgentEra/Agently-Talk-to-Control.git
+cd Agently-Talk-to-Control
+```
 
-- Step 3. Run python script: `python app.py` [[Install Python from Python Official Website]](https://www.python.org/)
+2. Install dependencies:
 
-- Step 4. Open Gradio UI page in your explorer: `http://127.0.0.1:7860/` by default
+```bash
+pip install -r requirements.txt
+```
 
-## Run Result Screenshot with Default Settings
+3. Configure `SETTINGS.yaml`.
 
-The image down below is a run result screenshot with the default settings of this project that only contain 2 cameras in component pool to be controlled. 
+Recommended Agently v4-style model config:
+
+```yaml
+AGENT_SETTINGS:
+  provider: "OpenAICompatible"
+  options:
+    base_url: ${ENV.DEEPSEEK_BASE_URL}
+    model: ${ENV.DEEPSEEK_DEFAULT_MODEL}
+    auth:
+      api_key: ${ENV.DEEPSEEK_API_KEY}
+```
+
+4. Start the app:
+
+```bash
+python app.py
+```
+
+5. Open the local Gradio page shown in the terminal. By default it runs on `http://127.0.0.1:7860/`.
+
+## Environment Variables
+
+`SETTINGS.yaml` supports `${ENV.VAR_NAME}` syntax.
+
+Project-side fields such as `UI` are resolved by this repo, and Agently-side model settings are passed through to Agently's `auto_load_env` support.
+
+Example:
+
+```yaml
+AGENT_SETTINGS:
+  provider: "OpenAICompatible"
+  options:
+    base_url: ${ENV.DEEPSEEK_BASE_URL}
+    model: ${ENV.DEEPSEEK_DEFAULT_MODEL}
+    auth:
+      api_key: ${ENV.DEEPSEEK_API_KEY}
+
+UI:
+  server_port: ${ENV.APP_PORT}
+```
+
+## Run Result Screenshot
+
+The screenshot below shows the default two-camera setup in action.
 
 <img width="480" alt="talk-to-control" src="https://github.com/user-attachments/assets/f6a09285-0620-4918-a577-d628c0bf4102" />
 
-## Try Extend Controllers
+## Extend Controllers
 
-Of course, as a showcase project, developers can extend more controllers and components to be controlled as followed.
+You can extend the device pool and controller set with three steps.
 
-- Step 1. Add component initial status into `SETTINGS.yaml`
+1. Add initial device state to `SETTINGS.yaml`.
 
-    For example: add 2 lights initial status
+Example: add two lights
 
-    ```yaml
-    INITIAL_STATUS:
-        light_status:
-            light_a:
-                power: 1
-                brightness: 50
-            light_b:
-                power: 0
-                brightness: 50
-    ```
+```yaml
+INITIAL_STATUS:
+  light_status:
+    light_a:
+      power: 1
+      brightness: 50
+    light_b:
+      power: 0
+      brightness: 50
+```
 
-- Step 2. Add controller functions into `controllers/controllers.py`
+2. Add controller functions to `controllers/controllers.py`.
 
-    For example: add 2 controller functions of light control
+```python
+def control_light_power(light_name, target_power):
+    power_status = ("Off", "On")
+    print(f"⚙️ [Turn On/Off Light]: {light_name} -> Power:{power_status[target_power]}")
+    return {"light_name": light_name, "power": target_power}
 
-    ```python
-    def control_light_power(light_name, target_power):
-        power_status = ("Off", "On")
-        print(f"⚙️ [Turn On/Off Light]: { light_name } -> Power:{ power_status[target_power] }")
-        return { "light_name": light_name, "power": target_power }
 
-    def control_light_brightness(light_name, brightness):
-        print(f"⚙️ [Adjust Light Brightness]: { light_name } -> Brightness:{ brightness }")
-        return { "light_name": light_name, "brightness": brightness }
-    ```
+def control_light_brightness(light_name, brightness):
+    print(f"⚙️ [Adjust Light Brightness]: {light_name} -> Brightness:{brightness}")
+    return {"light_name": light_name, "brightness": brightness}
+```
 
-- Step 3. Add controller settings into `SETTINGS.yaml` according status settings in step 1 and controller functions' definitions in step 2.
+3. Register the controllers in `SETTINGS.yaml`.
 
-    ```yaml
-    CONTROLLERS:
-        control_light_power:
-            desc: "turn on or off a target light"
-            args:
-                light_name:
-                    $type: "'light_a', 'light_b'"
-                    $desc: "[Required]"
-                target_power:
-                    $type: "int"
-                    $desc: "[Required]0 - Off, 1 - On"
-            func: "control_light_power"
-            # Will get environment information from target key before calling operation
-            get:
-                - "light_status"
-            # Will update environment information to target key with target value
-            # Placeholder <$variable_name> will be replaced by key values in controller function's return dict
-            set:
-                "light_status.<$light_name>.power": "<$power>"
-        control_light_brightness:
-            desc: "adjust a target light's brightness"
-            args:
-                light_name:
-                    $type: "'light_a', 'light_b'"
-                    $desc: "[Required]"
-                brightness:
-                    $type: "int"
-                    $desc: "[Required] Range: 0(darkest)-100(brightest)"
-    ```
+```yaml
+CONTROLLERS:
+  control_light_power:
+    desc: "turn on or off a target light"
+    args:
+      light_name:
+        $type: "'light_a' | 'light_b'"
+        $desc: "[Required]"
+      target_power:
+        $type: "int"
+        $desc: "[Required] 0 - Off, 1 - On"
+    func: "control_light_power"
+    get:
+      - "light_status"
+    set:
+      "light_status.<$light_name>.power": "<$power>"
 
-OK, now 2 light components have been added to component pool. Let's try to talk to control them.
+  control_light_brightness:
+    desc: "adjust a target light's brightness"
+    args:
+      light_name:
+        $type: "'light_a' | 'light_b'"
+        $desc: "[Required]"
+      brightness:
+        $type: "int"
+        $desc: "[Required] Range: 0-100"
+```
 
-<img width="480" alt="extend-controllers" src="https://github.com/user-attachments/assets/45c0532d-edea-4ec1-9bad-6028c77f8d48">
+## Agently v4 Version
 
-Everything seems to be great! Enjoy it!
+The current root project is the **Agently v4** implementation, based on:
 
-## Mainly Dependencies
+- **TriggerFlow** for orchestration
+- **Gradio** for the chat UI
+- Agently v4-style model settings with backward compatibility for older `MODEL_*` fields
 
-- **Agently AI Development Framework**: https://github.com/Maplemx/Agently | https://pypi.org/project/Agently/ | https://Agently.tech
+The original Agently v3 version is archived under [`/v3`](./v3).
 
+## Optimization Highlights
+
+Compared with the earlier root version of this repo, the current implementation includes:
+
+- **true incremental chat updates** in the Gradio UI instead of coarse block updates
+- **first-pass action arg generation**, so many requests avoid a second model call per action
+- **parallel execution for independent actions**, such as operations targeting different device resources
+- **environment-backed config loading**, including `${ENV.VAR}` support in `SETTINGS.yaml`
+
+## Project Structure
+
+- `app.py`: Gradio entrypoint
+- `workflows/talk_to_control.py`: TriggerFlow orchestration
+- `controllers/`: controller registry and device actions
+- `utils/`: config loading and chat-history helpers
+- `tests/`: flow and config tests
+- `v3/`: archived Agently v3 implementation
+
+## Main Dependencies
+
+- **Agently AI Development Framework**: https://github.com/Maplemx/Agently | https://pypi.org/project/Agently/ | https://agently.tech
 - **Gradio**: https://github.com/gradio-app/gradio | https://gradio.app/
-
----
-
-Please ⭐️ this repo and [Agently](https://github.com/Maplemx/Agently) main repo if you like it! Thank you very much!
-
-> 💬 WeChat Group（加入微信群）:
->
->  [Click Here to Apply](https://doc.weixin.qq.com/forms/AIoA8gcHAFMAScAhgZQABIlW6tV3l7QQf) or Scan the QR Code Down Below
->
-> <img width="120" alt="image" src="https://github.com/Maplemx/Agently/assets/4413155/7f4bc9bf-a125-4a1e-a0a4-0170b718c1a6">
